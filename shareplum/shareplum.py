@@ -730,6 +730,30 @@ class _List(object):
         else:
             return response
 
+    def AddAttachment(self, _id, fileName, base64Binary):
+        """Add Attachments for given List Item ID, fileName and base64Binary"""
+
+        # Build Request
+        soap_request = soap('AddAttachment')
+        soap_request.add_parameter('listName', self.listName)
+        soap_request.add_parameter('listItemID', _id)
+        soap_request.add_parameter('fileName', fileName)
+        soap_request.add_parameter('attachment', base64Binary)
+        self.last_request = str(soap_request)
+
+        # Send Request
+        response = self._session.post(url=self._url('Lists'),
+                                      headers=self._headers('AddAttachment'),
+                                      data=str(soap_request),
+                                      verify=False,
+                                      timeout=self.timeout)
+
+        # Parse Request
+        if response.status_code == 200:
+            return response.status_code
+        else:
+            return response
+
 
 class soap(object):
     """A simple class for building SAOP Requests"""
