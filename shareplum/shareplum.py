@@ -544,14 +544,21 @@ class _List(object):
             envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=self.huge_tree))
             _list = envelope[0][0][0][0]
             info = {key: value for (key, value) in _list.items()}
-            for row in _list[0].getchildren():
+            #if have ValidationDisplayNames, the _list[0] is not Fields tree. so use findall to search
+            fields_tree = _list.findall('.//{http://schemas.microsoft.com/sharepoint/soap/}Fields')
+            for row in fields_tree[0].getchildren():
+            #for row in _list[0].getchildren():
                 self.fields.append({key: value for (key, value) in row.items()})
-
-            for setting in _list[1].getchildren():
+            
+            regionalsetting_tree = _list.findall('.//{http://schemas.microsoft.com/sharepoint/soap/}RegionalSettings')
+            for setting in regionalsetting_tree[0].getchildren():
+            #for setting in _list[1].getchildren():
                 self.regional_settings[
                     setting.tag.strip('{http://schemas.microsoft.com/sharepoint/soap/}')] = setting.text
 
-            for setting in _list[2].getchildren():
+            serversetting_tree = _list.findall('.//{http://schemas.microsoft.com/sharepoint/soap/}ServerSettings')
+            for setting in serversetting_tree[0].getchildren():
+            #for setting in _list[2].getchildren():
                 self.server_settings[
                     setting.tag.strip('{http://schemas.microsoft.com/sharepoint/soap/}')] = setting.text
             fields = envelope[0][0][0][0][0]
