@@ -700,12 +700,25 @@ class _List(object):
         if response.status_code == 200:
             envelope = etree.fromstring(response.text.encode('utf-8'), parser=etree.XMLParser(huge_tree=self.huge_tree))
             results = envelope[0][0][0][0]
+            '''
             data = {}
             for result in results:
                 if result.text != '0x00000000' and result[0].text != '0x00000000':
                     data[result.attrib['ID']] = (result[0].text, result[1].text)
                 else:
                     data[result.attrib['ID']] = result[0].text
+            return data
+            '''
+            #return more data after UpdateListItems 
+            data = []
+            for result in results:
+                if result.text != '0x00000000' and result[0].text != '0x00000000':
+                    data[result.attrib['ID']] = (result[0].text, result[1].text)
+                else:
+                    for row in result:                 
+                        if len(row.items()) > 0:
+                            data.append({key[4:]: value for (key, value) in row.items()})
+            self._convert_to_display(data)
             return data
         else:
             return response
